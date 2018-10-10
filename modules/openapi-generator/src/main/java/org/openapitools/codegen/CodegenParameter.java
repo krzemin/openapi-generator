@@ -31,7 +31,7 @@ public class CodegenParameter {
 
     public String example; // example value (x-example)
     public String jsonSchema;
-    public boolean isString, isNumeric, isInteger, isLong, isNumber, isFloat, isDouble, isByteArray, isBinary, isBoolean, isDate, isDateTime, isUuid;
+    public boolean isString, isNumeric, isInteger, isLong, isNumber, isFloat, isDouble, isByteArray, isBinary, isBoolean, isDate, isTime, isDateTime, isUuid;
     public boolean isListContainer, isMapContainer;
     public boolean isFile;
     public boolean isEnum;
@@ -94,7 +94,7 @@ public class CodegenParameter {
      * See http://json-schema.org/latest/json-schema-validation.html#anchor14
      */
     public Number multipleOf;
-    
+
     public CodegenParameter copy() {
         CodegenParameter output = new CodegenParameter();
         output.isFile = this.isFile;
@@ -163,6 +163,7 @@ public class CodegenParameter {
         output.isNumber = this.isNumber;
         output.isBoolean = this.isBoolean;
         output.isDate = this.isDate;
+        output.isTime = this.isTime;
         output.isDateTime = this.isDateTime;
         output.isUuid = this.isUuid;
         output.isListContainer = this.isListContainer;
@@ -248,6 +249,8 @@ public class CodegenParameter {
         if (isBoolean != that.isBoolean)
             return false;
         if (isDate != that.isDate)
+            return false;
+        if (isTime != that.isTime)
             return false;
         if (isDateTime != that.isDateTime)
             return false;
@@ -336,6 +339,7 @@ public class CodegenParameter {
         result = 31 * result + (isBinary ? 13:31);
         result = 31 * result + (isBoolean ? 13:31);
         result = 31 * result + (isDate ? 13:31);
+        result = 31 * result + (isTime ? 13:31);
         result = 31 * result + (isDateTime ? 13:31);
         result = 31 * result + (isUuid ? 13:31);
         result = 31 * result + (isListContainer ? 13:31);
@@ -402,6 +406,7 @@ public class CodegenParameter {
                 ", isBinary=" + isBinary +
                 ", isBoolean=" + isBoolean +
                 ", isDate=" + isDate +
+                ", isTime=" + isTime +
                 ", isDateTime=" + isDateTime +
                 ", isUuid=" + isUuid +
                 ", isListContainer=" + isListContainer +

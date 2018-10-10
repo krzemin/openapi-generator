@@ -1341,6 +1341,8 @@ public class DefaultCodegen implements CodegenConfig {
             return SchemaTypeUtil.BOOLEAN_TYPE;
         } else if (ModelUtils.isDateSchema(schema)) {
             return SchemaTypeUtil.DATE_FORMAT;
+        } else if (ModelUtils.isTimeSchema(schema)) {
+            return "time";
         } else if (ModelUtils.isDateTimeSchema(schema)) {
             return "DateTime";
         } else if (ModelUtils.isNumberSchema(schema)) {
@@ -1846,6 +1848,22 @@ public class DefaultCodegen implements CodegenConfig {
         } else if (ModelUtils.isDateSchema(p)) { // date format
             property.isString = false; // for backward compatibility with 2.x
             property.isDate = true;
+            if (p.getEnum() != null) {
+                List<String> _enum = p.getEnum();
+                property._enum = new ArrayList<String>();
+                for (String i : _enum) {
+                    property._enum.add(i);
+                }
+                property.isEnum = true;
+
+                // legacy support
+                Map<String, Object> allowableValues = new HashMap<String, Object>();
+                allowableValues.put("values", _enum);
+                property.allowableValues = allowableValues;
+            }
+        } else if (ModelUtils.isTimeSchema(p)) { // time format
+            property.isString = false; // for backward compatibility with 2.x
+            property.isTime = true;
             if (p.getEnum() != null) {
                 List<String> _enum = p.getEnum();
                 property._enum = new ArrayList<String>();
@@ -2601,6 +2619,8 @@ public class DefaultCodegen implements CodegenConfig {
                 r.isFile = true;
             } else if (Boolean.TRUE.equals(cp.isDate)) {
                 r.isDate = true;
+            } else if (Boolean.TRUE.equals(cp.isTime)) {
+                r.isTime = true;
             } else if (Boolean.TRUE.equals(cp.isDateTime)) {
                 r.isDateTime = true;
             } else {
@@ -3865,6 +3885,9 @@ public class DefaultCodegen implements CodegenConfig {
         } else if (Boolean.TRUE.equals(property.isDate)) {
             parameter.isDate = true;
             parameter.isPrimitiveType = true;
+        } else if (Boolean.TRUE.equals(property.isTime)) {
+            parameter.isTime = true;
+            parameter.isPrimitiveType = true;
         } else if (Boolean.TRUE.equals(property.isDateTime)) {
             parameter.isDateTime = true;
             parameter.isPrimitiveType = true;
@@ -4698,6 +4721,6 @@ public class DefaultCodegen implements CodegenConfig {
      */
     public void postProcessFile(File file, String fileType) {
         LOGGER.debug("Post processing file {} ({})", file, fileType);
-    } 
+    }
 
 }

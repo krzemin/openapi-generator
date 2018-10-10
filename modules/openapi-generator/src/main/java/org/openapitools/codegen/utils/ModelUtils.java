@@ -409,6 +409,18 @@ public class ModelUtils {
         return false;
     }
 
+    public static boolean isTimeSchema(Schema schema) {
+//        if (schema instanceof TimeSchema) {
+//            return true;
+//        }
+
+        if (SchemaTypeUtil.STRING_TYPE.equals(schema.getType())
+                && "time".equals(schema.getFormat())) { // format: time
+            return true;
+        }
+        return false;
+    }
+
     public static boolean isDateTimeSchema(Schema schema) {
         if (schema instanceof DateTimeSchema) {
             return true;

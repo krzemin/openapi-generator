@@ -128,6 +128,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                 Arrays.asList(
                         "Byte",
                         "DateOnly",
+                        "TimeOnly",
                         "DateTime")
         );
 
@@ -146,6 +147,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
         typeMapping.put("array", "List");
         typeMapping.put("map", "Dict");
         typeMapping.put("date", "DateOnly");
+        typeMapping.put("time", "TimeOnly");
         typeMapping.put("DateTime", "DateTime");
         typeMapping.put("password", "String");
         typeMapping.put("ByteArray", "Byte");
@@ -191,6 +193,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                 LOGGER.info("Elm version = 0.18");
                 additionalProperties.put("isElm018", true);
                 supportingFiles.add(new SupportingFile("DateOnly018.mustache", "src", "DateOnly.elm"));
+                supportingFiles.add(new SupportingFile("TimeOnly018.mustache", "src", "TimeOnly.elm"));
                 supportingFiles.add(new SupportingFile("DateTime018.mustache", "src", "DateTime.elm"));
                 supportingFiles.add(new SupportingFile("elm-package018.mustache", "", "elm-package.json"));
                 supportingFiles.add(new SupportingFile("Main018.mustache", "src", "Main.elm"));
@@ -406,6 +409,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
 
         boolean hasDateTime = false;
         boolean hasDate = false;
+        boolean hasTime = false;
         final Map<String, Set<String>> dependencies = new HashMap<>();
 
         for (CodegenOperation op : ops) {
@@ -415,6 +419,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                 path = path.replace("{" + param.paramName + "}", "\" ++ " + var + " ++ \"");
                 hasDateTime = hasDateTime || param.isDateTime;
                 hasDate = hasDate || param.isDate;
+                hasTime = hasTime || param.isTime;
             }
             op.path = ("\"" + path + "\"").replaceAll(" \\+\\+ \"\"", "");
 
@@ -458,6 +463,14 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
             elmImport.hasExposures = true;
             elmImports.add(elmImport);
         }
+        if (hasTime) {
+            final ElmImport elmImport = new ElmImport();
+            elmImport.moduleName = "TimeOnly";
+            elmImport.exposures = new TreeSet<>();
+            elmImport.exposures.add("TimeOnly");
+            elmImport.hasExposures = true;
+            elmImports.add(elmImport);
+        }
         if (hasDateTime) {
             final ElmImport elmImport = new ElmImport();
             elmImport.moduleName = "DateTime";
@@ -484,6 +497,8 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
             }
             return toOptionalValue(null);
         } else if (ModelUtils.isDateSchema(p)) {
+            return toOptionalValue(null);
+        } else if (ModelUtils.isTimeSchema(p)) {
             return toOptionalValue(null);
         } else if (ModelUtils.isDateTimeSchema(p)) {
             return toOptionalValue(null);
@@ -521,6 +536,8 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
             return "DateTime.toString " + paramName;
         } else if (param.isDate) {
             return "DateOnly.toString " + paramName;
+        } else if (param.isTime) {
+            return "TimeOnly.toString " + paramName;
         } else if (ElmVersion.ELM_018.equals(elmVersion)) {
             return "toString " + paramName;
         } else if (param.isInteger || param.isLong) {

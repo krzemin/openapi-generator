@@ -1,0 +1,48 @@
+module TimeOnly exposing (TimeOnly, decoder, encoder, parse, toString)
+
+import Date exposing (Date)
+import Date.Extra
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Extra
+import Json.Encode as Encode
+import Regex
+import Result
+
+
+type alias TimeOnly =
+    Date
+
+
+decoder : Decoder TimeOnly
+decoder =
+    Decode.string
+        |> Decode.andThen (Json.Decode.Extra.fromResult << parse)
+
+
+encoder : TimeOnly -> Encode.Value
+encoder =
+    Encode.string << toString
+
+
+parse : String -> Result String TimeOnly
+parse str =
+    case Regex.find (Regex.AtMost 1) (Regex.regex "^(\\d{2}):(\\d{2}):(\\d{2})$") str of
+        [ { submatches } ] ->
+            case submatches of
+                [ Just strH, Just strM, Just strS ] ->
+                    let
+                        wrapTime intH intM intS =
+                            Date.Extra.fromParts 0 Date.Jan 0 intH intM intS 0
+                    in
+                    Result.map3 wrapTime (String.toInt strH) (String.toInt strM) (String.toInt strS)
+
+                _ ->
+                    Err ("Invalid time parsing: '" ++ str ++ "'")
+
+        _ ->
+            Err ("Invalid time: '" ++ str ++ "'")
+
+
+toString : TimeOnly -> String
+toString =
+    Date.Extra.toFormattedString "HH:mm"
