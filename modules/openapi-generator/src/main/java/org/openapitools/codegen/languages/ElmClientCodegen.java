@@ -431,6 +431,9 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                     }
                 }
             }
+
+            op.responses.sort((c1, c2) -> c1.code.compareTo(c2.code));
+
             for (CodegenResponse resp : op.responses) {
                 if (resp.primitiveType || resp.isMapContainer) {
                     continue;
